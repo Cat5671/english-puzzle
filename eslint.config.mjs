@@ -7,20 +7,20 @@ export default [
     ignores: ['dist/**', 'build/**', 'node_modules/**', 'coverage/**'],
   },
 
-  eslint.configs.recommended, 
-  ...tseslint.configs.strict,  
+  eslint.configs.recommended,
+  ...tseslint.configs.strict,
 
   {
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'module', 
-    }, 
-    rules: { 
-      '@typescript-eslint/no-explicit-any': 'error', 
+      sourceType: 'module',
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
       'max-lines-per-function': [
         'warn',
         { max: 40, skipBlankLines: true, skipComments: true },
-      ], 
+      ],
       '@typescript-eslint/no-magic-numbers': [
         'error',
         {
@@ -31,7 +31,7 @@ export default [
           ignore: [-1, 0, 1], // Разрешаем базовые числа для индексов и счетчиков
         },
       ],
-    }
-  }, 
+    },
+  },
   eslintConfigPrettier,
 ];
