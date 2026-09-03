@@ -5,12 +5,20 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.9.6",
     "typescript-eslint": "^8.69.0"
   },
   "scripts": {
     "format": "prettier --write .",
     "ci:format": "prettier --check .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
   }
 }
