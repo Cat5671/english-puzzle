@@ -1,0 +1,24 @@
+.game {  
+  display: grid;
+  grid-template-rows: auto 1fr 1fr;
+  justify-content: center;
+  justify-items: center;
+  gap: 20px;
+}
+
+.source-block,
+.result-block {
+  min-width: 600px;  
+  border: 2px dashed #ccc;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.word {
+  border: 1px solid grey;  
+  flex-grow: 1;
+  padding-block: 5px;  
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
