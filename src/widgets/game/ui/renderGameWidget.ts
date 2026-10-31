@@ -40,23 +40,42 @@ export function renderGameWidget(
     getGameRound(level, round).then((gameRoundData) => {
       if (!gameRoundData) return;
       const sentenceData = gameRoundData.words[sentenceIdx];
-      if (sentenceData) {
-        sourceBlock.textContent = '';
+      if (!sentenceData) return;
+      sourceBlock.textContent = '';
+      textContainer.textContent = sentenceData.textExampleTranslate;
+      const allWords = sentenceData.textExample.split(' ');
+      const fragment = new DocumentFragment();
+      const allWordsElems: HTMLElement[] = [];
 
-        const fragment = new DocumentFragment();
-
-        textContainer.textContent = sentenceData.textExampleTranslate;
-        for (const w of shuffle(sentenceData.textExample.split(' '))) {
-          fragment.append(
-            createElement({
-              tagName: 'span',
-              className: ['word'],
-              textContent: w,
-            })
-          );
-        }
-        sourceBlock.append(fragment);
+      for (const w of allWords) {
+        const el = createElement({
+          tagName: 'span',
+          className: ['word'],
+          textContent: w,
+        });
+        fragment.append(el);
+        allWordsElems.push(el);
       }
+
+      sourceBlock.append(fragment);
+
+      // ДАЕМ БРАУЗЕРУ ВРЕМЯ НА ОТРИСОВКУ
+      setTimeout(() => {
+        const allWordsWidths = allWordsElems.map(
+          (el) => el.getBoundingClientRect().width
+        );
+
+        allWordsElems.forEach((el, index) => {
+          el.style.width = `${allWordsWidths[index]}px`;
+          el.style.flexGrow = '0';
+          el.style.flexShrink = '0';
+        });
+        const shuffledElements = shuffle([...allWordsElems]);
+        sourceBlock.textContent = '';
+        const newFragment = new DocumentFragment();
+        shuffledElements.forEach((el) => newFragment.append(el));
+        sourceBlock.append(newFragment);
+      }, 0);
     });
   }
 
