@@ -4,5 +4,4 @@ export type {
   SentenceData,
   RoundData,
   LevelCollection,
-  SentenceIdx,
 } from './model/types';

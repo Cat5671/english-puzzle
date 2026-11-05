@@ -1,0 +1,14 @@
+.continue-btn {
+  display: none;
+  padding: 5px 20px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  background: cadetblue;
+  &:hover {
+    background: black;
+  }
+  &--visible {
+    display: block;
+  }
+}

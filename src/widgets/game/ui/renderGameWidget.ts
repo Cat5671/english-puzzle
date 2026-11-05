@@ -1,22 +1,19 @@
-import { type Levels } from '@/shared/config';
 import { createElement } from '@/shared/dom';
 import { shuffle } from '@/shared/array';
-import { getGameRound } from '@/entities/game';
-import { type SentenceIdx } from '@/entities/level';
+import { getGameRound, type GameData } from '@/entities/game';
+import { getLevelData } from '@/entities/level';
+import {
+  checkFinalSentence,
+  renderContinueButton,
+  getNextGameData,
+} from '@/features/continueGame';
 import './renderGameWidget.scss';
 
-export function renderGameWidget(
-  levelArg: Levels,
-  roundArg: number,
-  sentenceIdxArg: SentenceIdx
-): {
+export function renderGameWidget(gameData: GameData): {
   element: HTMLElement;
-  renderSourceContent: (
-    level: Levels,
-    round: number,
-    sentenceIdx: SentenceIdx
-  ) => void;
+  renderSourceContent: (gameData: GameData) => void;
 } {
+  let finalSentence: string[];
   const textContainer = createElement({
     tagName: 'p',
     className: ['source-language'],
@@ -29,32 +26,54 @@ export function renderGameWidget(
     tagName: 'div',
     className: ['result-block'],
   });
+  const continueButton = renderContinueButton();
+
+  continueButton.addEventListener('click', async () => {
+    const levelData = await getLevelData(gameData.level);
+
+    if (!levelData) {
+      console.error('Не удалось загрузить данные уровня');
+      return;
+    }
+
+    const totalRounds = levelData.rounds.length;
+    const nextGameData = getNextGameData(gameData, totalRounds);
+    if (typeof nextGameData === 'string') return;
+    gameData.level = nextGameData.level;
+    gameData.round = nextGameData.round;
+    gameData.sentenceIdx = nextGameData.sentenceIdx;
+    renderSourceContent(gameData);
+  });
+
   sourceBlock.addEventListener('click', moveToBlock);
   resultBlock.addEventListener('click', moveToBlock);
 
-  function renderSourceContent(
-    level: Levels,
-    round: number,
-    sentenceIdx: SentenceIdx
-  ) {
-    getGameRound(level, round).then((gameRoundData) => {
+  function renderSourceContent(gameData: GameData) {
+    getGameRound(gameData.level, gameData.round).then((gameRoundData) => {
       if (!gameRoundData) return;
-      const sentenceData = gameRoundData.words[sentenceIdx];
+      const sentenceData = gameRoundData.words[gameData.sentenceIdx];
       if (!sentenceData) return;
+      resultBlock.textContent = '';
+      continueButton.classList.remove('continue-btn--visible');
       sourceBlock.textContent = '';
       textContainer.textContent = sentenceData.textExampleTranslate;
       const allWords = sentenceData.textExample.split(' ');
+      finalSentence = allWords.slice();
       const fragment = new DocumentFragment();
       const allWordsElems: HTMLElement[] = [];
 
-      for (const w of allWords) {
-        const el = createElement({
-          tagName: 'span',
-          className: ['word'],
-          textContent: w,
-        });
-        fragment.append(el);
-        allWordsElems.push(el);
+      for (let i = 0; i < allWords.length; i += 1) {
+        const title = allWords[i];
+        if (title) {
+          const el = createElement({
+            tagName: 'span',
+            className: ['word'],
+            textContent: title,
+            attributes: { 'data-index': `${i}` },
+          });
+          fragment.append(el);
+          allWordsElems.push(el);
+        }
       }
 
       sourceBlock.append(fragment);
@@ -88,18 +107,22 @@ export function renderGameWidget(
 
     if (currTarget.classList.contains('source-block')) {
       resultBlock.append(wordElem);
+      if (checkFinalSentence(resultBlock, finalSentence)) {
+        continueButton.classList.add('continue-btn--visible');
+      }
     } else {
       sourceBlock.append(wordElem);
+      continueButton.classList.remove('continue-btn--visible');
     }
   }
 
-  renderSourceContent(levelArg, roundArg, sentenceIdxArg);
+  renderSourceContent(gameData);
 
   return {
     element: createElement({
       tagName: 'div',
       className: ['game'],
-      children: [textContainer, resultBlock, sourceBlock],
+      children: [textContainer, resultBlock, sourceBlock, continueButton],
     }),
     renderSourceContent,
   };

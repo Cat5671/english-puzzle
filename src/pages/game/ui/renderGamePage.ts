@@ -1,14 +1,15 @@
-import { type Levels } from '@/shared/config';
 import { createElement } from '@/shared/dom';
-import { type SentenceIdx } from '@/entities/level';
+import { type GameData } from '@/entities/game';
 import { renderGameWidget } from '@/widgets/game';
 
 export function renderGamePage(): HTMLElement {
-  const level: Levels = 1;
-  const round = 0;
-  const sentenceIdx: SentenceIdx = 0;
+  const gameData: GameData = {
+    level: 1,
+    round: 0,
+    sentenceIdx: 0,
+  };
 
-  const widget = renderGameWidget(level, round, sentenceIdx);
+  const widget = renderGameWidget(gameData);
 
   const container = createElement({
     tagName: 'div',
