@@ -1,7 +1,7 @@
 import { createElement } from '@/shared/dom';
 import { shuffle } from '@/shared/array';
-import { getGameRound, type GameData } from '@/entities/game';
-import { getLevelData } from '@/entities/level';
+import { type GameData } from '@/entities/game';
+import { getLevelData, getGameRound } from '@/entities/level';
 import {
   checkFinalSentence,
   renderContinueButton,
